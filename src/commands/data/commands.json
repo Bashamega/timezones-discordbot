@@ -1,0 +1,11 @@
+[
+  {
+    "name": "translate",
+    "description": "translate user"
+  },
+  { "name": "settimezone", "description": "Specify your timezone" },
+  {
+    "name": "mytimezone",
+    "description": "Check your timezone or a time zone of a user"
+  }
+]
