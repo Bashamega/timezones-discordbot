@@ -5,6 +5,6 @@
   },
   {
     "name": "mytimezone",
-    "description": "Retrieve your currently set timezone. Use this command to check which timezone you have configured for your account."
+    "description": "Retrieve your currently set timezone."
   }
 ]
