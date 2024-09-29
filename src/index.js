@@ -40,6 +40,25 @@ client.on('ready', () => {
 client.on('interactionCreate', async interaction => {
   if (interaction.isCommand()) {
     const { commandName } = interaction;
+    const authorId = interaction.user.id;
+
+    // Ensure that the command is "mytimezone"
+    if (commandName === 'mytimezone') {
+      // Construct the URL dynamically, using the author's ID
+      const url = `https://timezone-bot-backend.vercel.app/timezones/${authorId}`;
+
+      try {
+        // Make the fetch request to the constructed URL
+        const response = await fetch(url);
+        const data = await response.json();
+
+        // Reply with the author's ID or any data received
+        await interaction.reply(`Author ID: ${authorId}\nTimezone Data: ${JSON.stringify(data)}`);
+      } catch (error) {
+        console.error(error);
+        await interaction.reply('There was an error fetching the timezone data.');
+      }
+    }
   }
 });
 
