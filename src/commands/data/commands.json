@@ -6,5 +6,16 @@
   {
     "name": "mytimezone",
     "description": "Retrieve your currently set timezone."
+  },
+  {
+    "name": "user_timezone",
+    "description": "Retrieve the timezone of a specified user.",
+    "options": [
+      {
+        "name": "username",
+        "description": "The username to retrieve the timezone for.",
+        "required": true
+      }
+    ]
   }
 ]
