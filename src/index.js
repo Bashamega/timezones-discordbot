@@ -119,7 +119,7 @@ client.on("interactionCreate", async (interaction) => {
   }
 
   // Handle the selection of the timezone from the dropdown
-  if (interaction.isSelectMenu()) {
+  if (interaction.isStringSelectMenu()) {
     if (interaction.customId === 'timezone_select') {
       const selectedTimezone = interaction.values[0];
       const url = `https://timezone-bot-backend.vercel.app/timezones/`;
