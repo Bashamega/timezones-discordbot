@@ -1,8 +1,16 @@
-const { Client, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder } = require("discord.js");
+const {
+  Client,
+  GatewayIntentBits,
+  EmbedBuilder,
+  ActionRowBuilder,
+  StringSelectMenuBuilder,
+} = require("discord.js");
 require("dotenv").config();
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 const { RegisterCommands } = require("./commands/register");
+const moment = require("moment-timezone");
+
 const token = process.env.DISCORD_TOKEN;
 const clientId = process.env.DISCORD_CLIENT_ID;
 const commands = [].map((command) => command.toJSON());
@@ -68,12 +76,26 @@ client.on("interactionCreate", async (interaction) => {
             .setFooter({ text: "Timezone Bot" });
           await interaction.reply({ embeds: [embed] });
         } else {
-          const embed = new EmbedBuilder()
+          if (moment.tz.zone(data[0].timezone)) {
+            const currentTime = moment().tz(data[0].timezone).format("LLLL");
+            const embed = new EmbedBuilder()
             .setColor("#00FF00")
             .setTitle("Timezone Data")
-            .setDescription(`Author ID: ${authorId}\nTimezone Data: ${JSON.stringify(data)}`)
+            .addFields(
+              { name: "Your timezone:", value: data[0].timezone },
+              { name: "Your current time", value: currentTime }
+            )
             .setFooter({ text: "Timezone Bot" });
           await interaction.reply({ embeds: [embed] });
+          } else {
+            console.error("Invalid timezone provided");
+            const embed = new EmbedBuilder()
+            .setColor("#f70a0a")
+            .setTitle("Invalid timezone provided")
+
+            .setFooter({ text: "Timezone Bot" });
+          await interaction.reply({ embeds: [embed] });
+          }
         }
       } catch (error) {
         console.error(error);
@@ -99,8 +121,8 @@ client.on("interactionCreate", async (interaction) => {
       ];
 
       const timezoneSelectMenu = new StringSelectMenuBuilder()
-        .setCustomId('timezone_select')
-        .setPlaceholder('Select your timezone')
+        .setCustomId("timezone_select")
+        .setPlaceholder("Select your timezone")
         .addOptions(timezones);
 
       const row = new ActionRowBuilder().addComponents(timezoneSelectMenu);
@@ -120,7 +142,7 @@ client.on("interactionCreate", async (interaction) => {
 
   // Handle the selection of the timezone from the dropdown
   if (interaction.isStringSelectMenu()) {
-    if (interaction.customId === 'timezone_select') {
+    if (interaction.customId === "timezone_select") {
       const selectedTimezone = interaction.values[0];
       const url = `https://timezone-bot-backend.vercel.app/timezones/`;
 
@@ -133,7 +155,7 @@ client.on("interactionCreate", async (interaction) => {
           },
           body: JSON.stringify({
             timezone: selectedTimezone,
-            discord_user_id: interaction.user.id
+            discord_user_id: interaction.user.id,
           }),
         });
 
@@ -141,7 +163,9 @@ client.on("interactionCreate", async (interaction) => {
           const embed = new EmbedBuilder()
             .setColor("#00FF00")
             .setTitle("Timezone Set")
-            .setDescription(`Your timezone has been set to: ${selectedTimezone}`)
+            .setDescription(
+              `Your timezone has been set to: ${selectedTimezone}`
+            )
             .setFooter({ text: "Timezone Bot" });
           await interaction.reply({ embeds: [embed] });
         } else {
