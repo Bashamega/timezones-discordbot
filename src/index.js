@@ -78,7 +78,9 @@ client.on("interactionCreate", async (interaction) => {
         } else {
           const timezone = data[0].timezone;
           if (DateTime.local().setZone(timezone).isValid) {
-            const currentTime = DateTime.now().setZone(timezone).toLocaleString(DateTime.DATETIME_FULL);
+            const currentTime = DateTime.now()
+              .setZone(timezone)
+              .toLocaleString(DateTime.DATETIME_FULL);
             const embed = new EmbedBuilder()
               .setColor("#00FF00")
               .setTitle("Timezone Data")
@@ -109,20 +111,58 @@ client.on("interactionCreate", async (interaction) => {
     }
 
     if (commandName === "settimezone") {
-      const timezones = [
-        { label: "UTC", value: "UTC" },
-        { label: "PST", value: "America/Los_Angeles" },
-        { label: "MST", value: "America/Denver" },
-        { label: "CST", value: "America/Chicago" },
-        { label: "EST", value: "America/New_York" },
-        { label: "GMT", value: "GMT" },
-        // Add more timezones as needed
+      const createTimezone = (offset) => {
+        const sign = offset < 0 ? "+" : "-";
+        const absOffset = Math.abs(offset);
+        const hours = String(absOffset).padStart(2, "0");
+        const label = `GMT${sign}${hours}:00`;
+        const value = `Etc/GMT${sign}${hours}`;
+
+        return { label, value };
+      };
+
+      // Generate timezones, limiting to the most common ones
+      const timezones = [];
+      const offsetsToInclude = [
+        -12,
+        -11,
+        -10,
+        -9,
+        -8,
+        -7,
+        -6,
+        -5,
+        -4,
+        -3,
+        -2,
+        -1, // Negative offsets
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12, // Positive offsets
       ];
+
+      // Create timezone options
+      offsetsToInclude.forEach((offset) => {
+        timezones.push(createTimezone(offset));
+      });
+
+      // Optionally, you can limit the timezone options to a certain number (25 max)
+      const limitedTimezones = timezones.slice(0, 25); // Ensure max of 25 options
 
       const timezoneSelectMenu = new StringSelectMenuBuilder()
         .setCustomId("timezone_select")
         .setPlaceholder("Select your timezone")
-        .addOptions(timezones);
+        .addOptions(limitedTimezones);
 
       const row = new ActionRowBuilder().addComponents(timezoneSelectMenu);
 
@@ -165,13 +205,17 @@ client.on("interactionCreate", async (interaction) => {
           const embed = new EmbedBuilder()
             .setColor("#ed620c")
             .setTitle("No Timezone Registered")
-            .setDescription(`It looks like ${username} has not registered their timezone yet.`)
+            .setDescription(
+              `It looks like ${username} has not registered their timezone yet.`
+            )
             .setFooter({ text: "Timezone Bot" });
           await interaction.reply({ embeds: [embed] });
         } else {
           const timezone = data[0].timezone;
           if (DateTime.local().setZone(timezone).isValid) {
-            const currentTime = DateTime.now().setZone(timezone).toLocaleString(DateTime.DATETIME_FULL);
+            const currentTime = DateTime.now()
+              .setZone(timezone)
+              .toLocaleString(DateTime.DATETIME_FULL);
             const embed = new EmbedBuilder()
               .setColor("#00FF00")
               .setTitle("Timezone Data")
@@ -195,7 +239,9 @@ client.on("interactionCreate", async (interaction) => {
         const embed = new EmbedBuilder()
           .setColor("#FF0000")
           .setTitle("Error")
-          .setDescription("There was an error fetching the user's timezone data.")
+          .setDescription(
+            "There was an error fetching the user's timezone data."
+          )
           .setFooter({ text: "Timezone Bot" });
         await interaction.reply({ embeds: [embed] });
       }
