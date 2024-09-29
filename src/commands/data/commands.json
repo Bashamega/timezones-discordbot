@@ -3,9 +3,5 @@
     "name": "timezone",
     "description": "Check a user's timezone"
   },
-  { "name": "settimezone", "description": "Specify your timezone" },
-  {
-    "name": "mytimezone",
-    "description": "Check your timezone"
-  }
+  { "name": "settimezone", "description": "Specify your timezone" }
 ]
