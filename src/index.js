@@ -73,7 +73,7 @@ client.on("interactionCreate", async (interaction) => {
             .setColor("#ed620c")
             .setTitle("No Timezone Registered")
             .setDescription(
-              "It looks like you have not registered your timezone yet. Please use `/register` to set it up."
+              "It looks like you have not registered your timezone yet. Please use `/settimezone` to set it up."
             )
             .setFooter({ text: "Timezone Bot" });
 
