@@ -9,7 +9,7 @@ require("dotenv").config();
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 const { RegisterCommands } = require("./commands/register");
-const moment = require("moment-timezone");
+const { DateTime } = require("luxon"); // Importing DateTime from Luxon
 
 const token = process.env.DISCORD_TOKEN;
 const clientId = process.env.DISCORD_CLIENT_ID;
@@ -76,25 +76,25 @@ client.on("interactionCreate", async (interaction) => {
             .setFooter({ text: "Timezone Bot" });
           await interaction.reply({ embeds: [embed] });
         } else {
-          if (moment.tz.zone(data[0].timezone)) {
-            const currentTime = moment().tz(data[0].timezone).format("LLLL");
+          const timezone = data[0].timezone;
+          if (DateTime.local().setZone(timezone).isValid) {
+            const currentTime = DateTime.now().setZone(timezone).toLocaleString(DateTime.DATETIME_FULL);
             const embed = new EmbedBuilder()
-            .setColor("#00FF00")
-            .setTitle("Timezone Data")
-            .addFields(
-              { name: "Your timezone:", value: data[0].timezone },
-              { name: "Your current time", value: currentTime }
-            )
-            .setFooter({ text: "Timezone Bot" });
-          await interaction.reply({ embeds: [embed] });
+              .setColor("#00FF00")
+              .setTitle("Timezone Data")
+              .addFields(
+                { name: "Your timezone:", value: timezone },
+                { name: "Your current time", value: currentTime }
+              )
+              .setFooter({ text: "Timezone Bot" });
+            await interaction.reply({ embeds: [embed] });
           } else {
             console.error("Invalid timezone provided");
             const embed = new EmbedBuilder()
-            .setColor("#f70a0a")
-            .setTitle("Invalid timezone provided")
-
-            .setFooter({ text: "Timezone Bot" });
-          await interaction.reply({ embeds: [embed] });
+              .setColor("#f70a0a")
+              .setTitle("Invalid timezone provided")
+              .setFooter({ text: "Timezone Bot" });
+            await interaction.reply({ embeds: [embed] });
           }
         }
       } catch (error) {
