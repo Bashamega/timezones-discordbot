@@ -1,11 +1,10 @@
 [
   {
-    "name": "timezone",
-    "description": "Check a user's timezone"
+    "name": "settimezone",
+    "description": "Set your current timezone. This command allows you to specify the timezone you are in."
   },
-  { "name": "settimezone", "description": "Specify your timezone" },
   {
     "name": "mytimezone",
-    "description": "Check your timezone"
+    "description": "Retrieve your currently set timezone. Use this command to check which timezone you have configured for your account."
   }
 ]
