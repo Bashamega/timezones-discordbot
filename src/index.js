@@ -109,7 +109,6 @@ client.on("interactionCreate", async (interaction) => {
     }
 
     if (commandName === "settimezone") {
-      // Create a dropdown menu for selecting a timezone
       const timezones = [
         { label: "UTC", value: "UTC" },
         { label: "PST", value: "America/Los_Angeles" },
@@ -137,6 +136,69 @@ client.on("interactionCreate", async (interaction) => {
         embeds: [embed],
         components: [row],
       });
+    }
+
+    if (commandName === "user_timezone") {
+      const username = interaction.options.getString("username");
+      const url = `https://timezone-bot-backend.vercel.app/timezones/${username}`;
+
+      try {
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${clientId}_${token}`,
+          },
+        });
+        const data = await response.json();
+
+        if (response.status === 403) {
+          const embed = new EmbedBuilder()
+            .setColor("#FF0000")
+            .setTitle("Forbidden")
+            .setDescription(data.error)
+            .setFooter({ text: "Timezone Bot" });
+          await interaction.reply({ embeds: [embed] });
+          return;
+        }
+
+        if (Array.isArray(data) && data.length === 0) {
+          const embed = new EmbedBuilder()
+            .setColor("#ed620c")
+            .setTitle("No Timezone Registered")
+            .setDescription(`It looks like ${username} has not registered their timezone yet.`)
+            .setFooter({ text: "Timezone Bot" });
+          await interaction.reply({ embeds: [embed] });
+        } else {
+          const timezone = data[0].timezone;
+          if (DateTime.local().setZone(timezone).isValid) {
+            const currentTime = DateTime.now().setZone(timezone).toLocaleString(DateTime.DATETIME_FULL);
+            const embed = new EmbedBuilder()
+              .setColor("#00FF00")
+              .setTitle("Timezone Data")
+              .addFields(
+                { name: "User's timezone:", value: timezone },
+                { name: "User's current time", value: currentTime }
+              )
+              .setFooter({ text: "Timezone Bot" });
+            await interaction.reply({ embeds: [embed] });
+          } else {
+            console.error("Invalid timezone provided");
+            const embed = new EmbedBuilder()
+              .setColor("#f70a0a")
+              .setTitle("Invalid timezone provided")
+              .setFooter({ text: "Timezone Bot" });
+            await interaction.reply({ embeds: [embed] });
+          }
+        }
+      } catch (error) {
+        console.error(error);
+        const embed = new EmbedBuilder()
+          .setColor("#FF0000")
+          .setTitle("Error")
+          .setDescription("There was an error fetching the user's timezone data.")
+          .setFooter({ text: "Timezone Bot" });
+        await interaction.reply({ embeds: [embed] });
+      }
     }
   }
 
