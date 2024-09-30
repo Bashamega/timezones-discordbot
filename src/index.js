@@ -39,7 +39,11 @@ const client = new Client({
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
-
+function extractUserId(mention) {
+  // Use a regular expression to match the user ID
+  const match = mention.match(/^<@(\d+)>$/);
+  return match ? match[1] : null; // Return the user ID or null if not a valid mention
+}
 client.on("interactionCreate", async (interaction) => {
   if (interaction.isCommand()) {
     const { commandName } = interaction;
@@ -180,7 +184,7 @@ client.on("interactionCreate", async (interaction) => {
 
     if (commandName === "user_timezone") {
       const username = interaction.options.getString("username");
-      const url = `https://timezone-bot-backend.vercel.app/timezones/${username}`;
+      const url = `https://timezone-bot-backend.vercel.app/timezones/${extractUserId(username)}`;
 
       try {
         const response = await fetch(url, {
